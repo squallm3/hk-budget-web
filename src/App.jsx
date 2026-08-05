@@ -35,6 +35,12 @@ export default function App() {
   const [txModal, setTxModal] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [xpToast, setXpToast] = useState(false);
+
+  const mostrarXpToast = () => {
+    setXpToast(true);
+    setTimeout(() => setXpToast(false), 2200);
+  };
 
   useEffect(() => {
     const unsubscribe = suscribirseAUsuario((u) => {
@@ -104,6 +110,7 @@ export default function App() {
         const nueva = await api.crearCuenta(data);
         setCuentas((prev) => [...prev, nueva]);
         api.sumarXp(111).catch((err) => console.error('No se pudo sumar XP', err));
+        mostrarXpToast();
       }
       setAccountModal(null);
     });
@@ -117,6 +124,7 @@ export default function App() {
         const nueva = await api.crearCategoria(data);
         setCategorias((prev) => [...prev, nueva]);
         api.sumarXp(111).catch((err) => console.error('No se pudo sumar XP', err));
+        mostrarXpToast();
       }
       setCategoryModal(null);
     });
@@ -130,6 +138,7 @@ export default function App() {
         const nueva = await api.crearTransaccion(data);
         setTransacciones((prev) => [nueva, ...prev]);
         api.sumarXp(111).catch((err) => console.error('No se pudo sumar XP', err));
+        mostrarXpToast();
       }
       setTxModal(null);
     });
@@ -250,6 +259,10 @@ export default function App() {
           </button>
         ))}
       </nav>
+
+      {xpToast && (
+        <div className="xp-toast">+111 XP</div>
+      )}
 
       {accountModal && (
         <AccountForm

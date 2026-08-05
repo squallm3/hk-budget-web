@@ -177,3 +177,26 @@ main { flex: 1; padding: 24px; padding-bottom: 80px; }
 
 .error { color: var(--coral); font-size: 13px; margin-top: 12px; }
 .error.banner { background: rgba(192,57,43,0.15); border: 1px solid var(--coral); padding: 10px 14px; border-radius: 10px; margin-bottom: 16px; }
+
+.xp-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--acento);
+  color: #fff;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(136, 51, 255, 0.5);
+  z-index: 100;
+  animation: xp-toast-in 0.25s ease-out;
+}
+
+@keyframes xp-toast-in {
+  from { opacity: 0; transform: translate(-50%, -12px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
