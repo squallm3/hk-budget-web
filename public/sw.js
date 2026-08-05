@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hk-budget-web-v1';
+const CACHE_NAME = 'hk-budget-web-v2';
 const APP_SHELL = ['/', '/manifest.json', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', (event) => {
@@ -28,18 +28,17 @@ self.addEventListener('fetch', (event) => {
   // Solo cachear pedidos GET del propio origen (el shell de la app)
   if (event.request.method !== 'GET') return;
 
+  // Red primero: si hay conexión, siempre trae la versión más nueva.
+  // Si falla (sin conexión), recién ahí usa lo que haya en caché.
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const network = fetch(event.request)
-        .then((response) => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          }
-          return response;
-        })
-        .catch(() => cached || caches.match('/'));
-      return cached || network;
-    })
+    fetch(event.request)
+      .then((response) => {
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request).then((cached) => cached || caches.match('/')))
   );
 });
