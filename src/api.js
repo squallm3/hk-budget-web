@@ -26,6 +26,10 @@ async function authFetch(path, options = {}) {
   return res.json();
 }
 
+// XP / niveles (compartido con las demás apps del RPG)
+export const sumarXp = (delta) =>
+  authFetch('/api/personajes/mio/sumar-xp', { method: 'PUT', body: JSON.stringify({ delta }) });
+
 // Cuentas
 export const listarCuentas = () => authFetch('/api/cuentas');
 export const crearCuenta = (data) => authFetch('/api/cuentas', { method: 'POST', body: JSON.stringify(data) });

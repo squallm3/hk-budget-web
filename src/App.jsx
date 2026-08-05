@@ -103,6 +103,7 @@ export default function App() {
       } else {
         const nueva = await api.crearCuenta(data);
         setCuentas((prev) => [...prev, nueva]);
+        api.sumarXp(111).catch((err) => console.error('No se pudo sumar XP', err));
       }
       setAccountModal(null);
     });
@@ -115,6 +116,7 @@ export default function App() {
       } else {
         const nueva = await api.crearCategoria(data);
         setCategorias((prev) => [...prev, nueva]);
+        api.sumarXp(111).catch((err) => console.error('No se pudo sumar XP', err));
       }
       setCategoryModal(null);
     });
@@ -127,6 +129,7 @@ export default function App() {
       } else {
         const nueva = await api.crearTransaccion(data);
         setTransacciones((prev) => [nueva, ...prev]);
+        api.sumarXp(111).catch((err) => console.error('No se pudo sumar XP', err));
       }
       setTxModal(null);
     });
