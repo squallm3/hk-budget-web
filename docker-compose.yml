@@ -1,0 +1,7 @@
+services:
+  hk-budget-web:
+    build: .
+    container_name: hk-budget-web
+    restart: unless-stopped
+    ports:
+      - "5173:80"
