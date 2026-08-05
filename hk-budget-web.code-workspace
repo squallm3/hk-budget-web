@@ -1,0 +1,21 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "workbench.colorTheme": "Dark Modern",
+    "workbench.colorCustomizations": {
+      "editor.background": "#0e0b1a",
+      "editor.foreground": "#f0e0ff",
+      "sideBar.background": "#160830",
+      "activityBar.background": "#1a0838",
+      "activityBarBadge.background": "#8833ff",
+      "statusBar.background": "#1a0838",
+      "titleBar.activeBackground": "#1a0838",
+      "focusBorder": "#aa44ff",
+      "button.background": "#8833ff"
+    }
+  }
+}
