@@ -396,7 +396,8 @@ function sumarMes(mesISO, delta) {
 export function BudgetView({ presupuesto, mes, onCambiarMes, onAsignar, categorias, saving, totalBalance }) {
   const totalAsignado = presupuesto.reduce((s, p) => s + Number(p.montoAsignado), 0);
   const totalGastado = presupuesto.reduce((s, p) => s + Number(p.gastado), 0);
-  const sinAsignar = totalBalance - totalAsignado;
+  const totalDisponibleAcumulado = presupuesto.reduce((s, p) => s + Number(p.disponible), 0);
+  const sinAsignar = totalBalance - totalDisponibleAcumulado;
 
   return (
     <div>
@@ -437,7 +438,7 @@ export function BudgetView({ presupuesto, mes, onCambiarMes, onAsignar, categori
         </div>
         <div className="card total">
           <p className="label">Disponible</p>
-          <p className="value">{currency(totalAsignado - totalGastado)}</p>
+          <p className="value">{currency(totalDisponibleAcumulado)}</p>
         </div>
       </div>
 
