@@ -494,3 +494,63 @@ export function BudgetView({ presupuesto, mes, onCambiarMes, onAsignar, categori
     </div>
   );
 }
+
+// ---------- Mi Personaje ----------
+const TIENDA_IMG_BASE = 'https://presugnostico.duckdns.org/tienda/';
+const TIENDA_GENERAL_URL = 'https://haikusgnosticos.duckdns.org';
+const TIENDA_NIVEL_URL = 'https://haikusgnosticos.duckdns.org/tienda/niveles';
+
+export function PersonajeView({ personaje, cargando }) {
+  const [imagenActiva, setImagenActiva] = useState('A');
+
+  if (cargando) {
+    return (
+      <div>
+        <h2 className="view-title">Mi Personaje</h2>
+        <p className="view-sub">Cargando...</p>
+      </div>
+    );
+  }
+
+  if (!personaje) {
+    return (
+      <div>
+        <h2 className="view-title">Mi Personaje</h2>
+        <EmptyState title="No se pudo cargar tu personaje" hint="Probá recargar la página." />
+      </div>
+    );
+  }
+
+  const imagen = imagenActiva === 'A' ? personaje.imagenA : personaje.imagenB;
+
+  return (
+    <div>
+      <h2 className="view-title">Mi Personaje</h2>
+      <p className="view-sub">Tu progreso en el universo Haikus Gnósticos.</p>
+
+      <div className="personaje-card">
+        {imagen && (
+          <img
+            className="personaje-img"
+            src={`${TIENDA_IMG_BASE}${imagen}`}
+            alt={personaje.artefacto || 'Artefacto'}
+          />
+        )}
+        {personaje.imagenA && personaje.imagenB && (
+          <div className="personaje-img-toggle">
+            <button className={imagenActiva === 'A' ? 'active' : ''} onClick={() => setImagenActiva('A')}>Vista A</button>
+            <button className={imagenActiva === 'B' ? 'active' : ''} onClick={() => setImagenActiva('B')}>Vista B</button>
+          </div>
+        )}
+        <p className="personaje-nivel-titulo">{personaje.titulo}</p>
+        {personaje.artefacto && <p className="personaje-artefacto">{personaje.artefacto}</p>}
+        <p className="personaje-xp">{personaje.xpAcumulada} XP acumulada</p>
+      </div>
+
+      <div className="personaje-links">
+        <a className="btn" href={TIENDA_GENERAL_URL} target="_blank" rel="noopener noreferrer">Ir a la tienda general</a>
+        <a className="btn ghost" href={TIENDA_NIVEL_URL} target="_blank" rel="noopener noreferrer">Productos de mi nivel</a>
+      </div>
+    </div>
+  );
+}

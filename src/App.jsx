@@ -10,6 +10,7 @@ import {
   TransactionsView,
   TransactionForm,
   BudgetView,
+  PersonajeView,
   mesActualISO,
   Modal,
 } from './views.jsx';
@@ -20,6 +21,7 @@ const NAV = [
   { key: 'cuentas', label: 'Cuentas' },
   { key: 'categorias', label: 'Categorías' },
   { key: 'transacciones', label: 'Transacciones' },
+  { key: 'personaje', label: 'Mi Personaje' },
 ];
 
 export default function App() {
@@ -36,6 +38,9 @@ export default function App() {
   const [mes, setMes] = useState(mesActualISO());
   const [presupuesto, setPresupuesto] = useState([]);
   const [cargandoPresupuesto, setCargandoPresupuesto] = useState(false);
+
+  const [personaje, setPersonaje] = useState(null);
+  const [cargandoPersonaje, setCargandoPersonaje] = useState(false);
 
   const [accountModal, setAccountModal] = useState(null);
   const [categoryModal, setCategoryModal] = useState(null);
@@ -76,6 +81,21 @@ export default function App() {
         setErrorGlobal(err.message);
       } finally {
         setCargandoDatos(false);
+      }
+    })();
+  }, [usuario]);
+
+  useEffect(() => {
+    if (!usuario) return;
+    (async () => {
+      setCargandoPersonaje(true);
+      try {
+        const p = await api.obtenerPersonaje();
+        setPersonaje(p);
+      } catch (err) {
+        console.error('No se pudo cargar el personaje', err);
+      } finally {
+        setCargandoPersonaje(false);
       }
     })();
   }, [usuario]);
@@ -309,6 +329,9 @@ export default function App() {
                 onEdit={(t) => setTxModal(t)}
                 onDelete={(t) => setConfirmDelete({ type: 'transaccion', id: t.id, label: t.descripcion || 'movimiento' })}
               />
+            )}
+            {view === 'personaje' && (
+              <PersonajeView personaje={personaje} cargando={cargandoPersonaje} />
             )}
           </>
         )}

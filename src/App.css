@@ -344,3 +344,73 @@ main { flex: 1; padding: 24px; }
 }
 .sin-asignar-banner.completo { background: var(--sage); }
 .sin-asignar-banner.sobregirado { background: var(--coral); }
+
+/* Mi Personaje */
+.personaje-card {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 20px;
+  padding: 24px;
+  text-align: center;
+  max-width: 380px;
+  margin: 0 auto 20px;
+}
+.personaje-img {
+  width: 100%;
+  max-width: 260px;
+  border-radius: 14px;
+  border: 1px solid var(--borde);
+  margin-bottom: 12px;
+}
+.personaje-img-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.personaje-img-toggle button {
+  background: transparent;
+  border: 1px solid var(--borde);
+  color: var(--texto-secundario);
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.personaje-img-toggle button.active {
+  background: var(--acento);
+  border-color: var(--acento);
+  color: #fff;
+}
+.personaje-nivel-titulo {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--acento-claro);
+  margin: 0 0 4px;
+}
+.personaje-artefacto {
+  font-size: 13px;
+  color: var(--texto-secundario);
+  margin: 0 0 10px;
+}
+.personaje-xp {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 15px;
+  color: var(--texto);
+  margin: 0;
+}
+.personaje-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 380px;
+  margin: 0 auto;
+}
+.personaje-links a {
+  text-align: center;
+  text-decoration: none;
+}
+@media (min-width: 640px) {
+  .personaje-links { flex-direction: row; }
+}
