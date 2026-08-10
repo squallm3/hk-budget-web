@@ -9,10 +9,13 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </React.StrictMode>
 );
 
+// Service worker desactivado: nos aseguramos de desregistrar cualquiera
+// que haya quedado instalado de versiones anteriores y de limpiar su cache.
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch((err) => {
-      console.error('No se pudo registrar el service worker', err);
-    });
+  navigator.serviceWorker.getRegistrations().then((registraciones) => {
+    registraciones.forEach((registracion) => registracion.unregister());
   });
+  if (window.caches) {
+    caches.keys().then((keys) => keys.forEach((k) => caches.delete(k)));
+  }
 }
