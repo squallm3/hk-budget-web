@@ -80,20 +80,22 @@ export default function App() {
     })();
   }, [usuario]);
 
+  const cargarPresupuesto = async (mesAConsultar) => {
+    setCargandoPresupuesto(true);
+    setErrorGlobal('');
+    try {
+      const p = await api.listarPresupuesto(mesAConsultar);
+      setPresupuesto(p);
+    } catch (err) {
+      setErrorGlobal(err.message);
+    } finally {
+      setCargandoPresupuesto(false);
+    }
+  };
+
   useEffect(() => {
     if (!usuario) return;
-    (async () => {
-      setCargandoPresupuesto(true);
-      setErrorGlobal('');
-      try {
-        const p = await api.listarPresupuesto(mes);
-        setPresupuesto(p);
-      } catch (err) {
-        setErrorGlobal(err.message);
-      } finally {
-        setCargandoPresupuesto(false);
-      }
-    })();
+    cargarPresupuesto(mes);
   }, [usuario, mes]);
 
   const balanceOf = (cuentaId) => {
@@ -153,6 +155,7 @@ export default function App() {
         setCategorias((prev) => [...prev, nueva]);
         api.sumarXp(111).catch((err) => console.error('No se pudo sumar XP', err));
         mostrarXpToast();
+        cargarPresupuesto(mes);
       }
       setCategoryModal(null);
     });
@@ -171,7 +174,7 @@ export default function App() {
       setTxModal(null);
       // el gasto recién cargado puede afectar el "gastado" del mes actual, refrescamos
       if (mes === (data.fecha || '').slice(0, 7)) {
-        api.listarPresupuesto(mes).then(setPresupuesto).catch(() => {});
+        cargarPresupuesto(mes);
       }
     });
 
@@ -190,15 +193,18 @@ export default function App() {
         await api.eliminarCuenta(id);
         setCuentas((prev) => prev.filter((c) => c.id !== id));
         setTransacciones((prev) => prev.filter((t) => t.cuentaId !== id));
+        cargarPresupuesto(mes);
       }
       if (type === 'categoria') {
         await api.eliminarCategoria(id);
         setCategorias((prev) => prev.filter((c) => c.id !== id));
         setTransacciones((prev) => prev.map((t) => (t.categoriaId === id ? { ...t, categoriaId: null } : t)));
+        cargarPresupuesto(mes);
       }
       if (type === 'transaccion') {
         await api.eliminarTransaccion(id);
         setTransacciones((prev) => prev.filter((t) => t.id !== id));
+        cargarPresupuesto(mes);
       }
       setConfirmDelete(null);
     });
