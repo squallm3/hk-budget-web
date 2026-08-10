@@ -43,6 +43,7 @@ export default function App() {
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [saving, setSaving] = useState(false);
   const [xpToast, setXpToast] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const mostrarXpToast = () => {
     setXpToast(true);
@@ -224,6 +225,11 @@ export default function App() {
 
   return (
     <div className="layout">
+      <header className="mobile-header">
+        <span className="mobile-header-title">hk-budget-web</span>
+        <button className="hamburger-btn" onClick={() => setMobileMenuOpen(true)} aria-label="Abrir menú">☰</button>
+      </header>
+
       <aside className="sidebar">
         <div className="brand">
           <h1>hk-budget-web</h1>
@@ -302,14 +308,39 @@ export default function App() {
         )}
       </main>
 
-      {/* mobile nav */}
-      <nav className="mobile-nav">
-        {NAV.map(({ key, label }) => (
-          <button key={key} className={view === key ? 'active' : ''} onClick={() => setView(key)}>
-            {label}
-          </button>
-        ))}
-      </nav>
+      {mobileMenuOpen && (
+        <div className="mobile-menu-overlay" onClick={() => setMobileMenuOpen(false)}>
+          <div className="mobile-menu" onClick={(e) => e.stopPropagation()}>
+            <div className="mobile-menu-header">
+              <p className="mobile-menu-email">{usuario.email}</p>
+              <button className="icon-btn" onClick={() => setMobileMenuOpen(false)} aria-label="Cerrar menú">✕</button>
+            </div>
+            <nav>
+              {NAV.map(({ key, label }) => (
+                <button
+                  key={key}
+                  className={view === key ? 'active' : ''}
+                  onClick={() => {
+                    setView(key);
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </nav>
+            <div className="saldo">
+              <p>Saldo total</p>
+              <p className="mono">
+                {cargandoDatos
+                  ? '...'
+                  : new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(totalBalance)}
+              </p>
+            </div>
+            <button className="btn ghost logout" onClick={logout}>Cerrar sesión</button>
+          </div>
+        </div>
+      )}
 
       {xpToast && (
         <div className="xp-toast">+111 XP</div>
