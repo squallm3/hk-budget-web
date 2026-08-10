@@ -393,9 +393,10 @@ function sumarMes(mesISO, delta) {
   return `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}`;
 }
 
-export function BudgetView({ presupuesto, mes, onCambiarMes, onAsignar, categorias, saving }) {
+export function BudgetView({ presupuesto, mes, onCambiarMes, onAsignar, categorias, saving, totalBalance }) {
   const totalAsignado = presupuesto.reduce((s, p) => s + Number(p.montoAsignado), 0);
   const totalGastado = presupuesto.reduce((s, p) => s + Number(p.gastado), 0);
+  const sinAsignar = totalBalance - totalAsignado;
 
   return (
     <div>
@@ -409,6 +410,20 @@ export function BudgetView({ presupuesto, mes, onCambiarMes, onAsignar, categori
           <span className="month-label">{nombreMes(mes)}</span>
           <button className="icon-btn" onClick={() => onCambiarMes(sumarMes(mes, 1))}>▶</button>
         </div>
+      </div>
+
+      <div className={`sin-asignar-banner ${sinAsignar < 0 ? 'sobregirado' : sinAsignar === 0 ? 'completo' : ''}`}>
+        <p className="sin-asignar-label">
+          {sinAsignar < 0 ? 'Asignaste de más' : sinAsignar === 0 ? 'Todo asignado' : 'Sin asignar'}
+        </p>
+        <p className="sin-asignar-value">{currency(Math.abs(sinAsignar))}</p>
+        <p className="sin-asignar-hint">
+          {sinAsignar < 0
+            ? 'Sacale plata a alguna categoría para volver a cuadrar.'
+            : sinAsignar === 0
+            ? 'Le diste un destino a cada peso que tenés.'
+            : 'Esta plata todavía no tiene un destino — asignala a alguna categoría de abajo.'}
+        </p>
       </div>
 
       <div className="cards-row">

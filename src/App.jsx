@@ -263,6 +263,7 @@ export default function App() {
                 onAsignar={asignarPresupuesto}
                 categorias={categorias}
                 saving={saving || cargandoPresupuesto}
+                totalBalance={totalBalance}
               />
             )}
             {view === 'cuentas' && (
