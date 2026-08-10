@@ -1,21 +1,52 @@
 {
-  "folders": [
-    {
-      "path": "."
-    }
-  ],
-  "settings": {
-    "workbench.colorTheme": "Dark Modern",
-    "workbench.colorCustomizations": {
-      "editor.background": "#0e0b1a",
-      "editor.foreground": "#f0e0ff",
-      "sideBar.background": "#160830",
-      "activityBar.background": "#1a0838",
-      "activityBarBadge.background": "#8833ff",
-      "statusBar.background": "#1a0838",
-      "titleBar.activeBackground": "#1a0838",
-      "focusBorder": "#aa44ff",
-      "button.background": "#8833ff"
-    }
-  }
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"workbench.colorTheme": "Dark Modern",
+		"workbench.preferredDarkColorTheme": "Dark Modern",
+		"workbench.colorCustomizations": {
+			"editor.background": "#0e0b1a",
+			"editor.foreground": "#f0e0ff",
+			"editorLineNumber.foreground": "#7060a0",
+			"editorCursor.foreground": "#aa44ff",
+			"editor.selectionBackground": "#8833ff55",
+			"sideBar.background": "#160830",
+			"sideBar.foreground": "#c0a0e0",
+			"sideBarTitle.foreground": "#f0e0ff",
+			"activityBar.background": "#1a0838",
+			"activityBar.foreground": "#f0e0ff",
+			"activityBar.inactiveForeground": "#7060a0",
+			"activityBarBadge.background": "#8833ff",
+			"activityBarBadge.foreground": "#ffffff",
+			"statusBar.background": "#1a0838",
+			"statusBar.foreground": "#f0e0ff",
+			"statusBarItem.hoverBackground": "#2a1550",
+			"titleBar.activeBackground": "#1a0838",
+			"titleBar.activeForeground": "#f0e0ff",
+			"titleBar.inactiveBackground": "#160830",
+			"tab.activeBackground": "#160830",
+			"tab.activeForeground": "#f0e0ff",
+			"tab.inactiveBackground": "#0e0b1a",
+			"tab.inactiveForeground": "#7060a0",
+			"tab.border": "#2a1550",
+			"panel.background": "#160830",
+			"panel.border": "#2a1550",
+			"terminal.background": "#0e0b1a",
+			"terminal.foreground": "#f0e0ff",
+			"focusBorder": "#aa44ff",
+			"button.background": "#8833ff",
+			"button.hoverBackground": "#aa44ff",
+			"input.background": "#160830",
+			"input.foreground": "#f0e0ff",
+			"input.border": "#2a1550",
+			"list.activeSelectionBackground": "#2a1550",
+			"list.activeSelectionForeground": "#f0e0ff",
+			"list.hoverBackground": "#160830",
+			"scrollbarSlider.background": "#2a155099",
+			"scrollbarSlider.hoverBackground": "#8833ff77"
+		}
+	}
 }

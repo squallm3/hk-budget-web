@@ -449,7 +449,7 @@ export function BudgetView({ presupuesto, mes, onCambiarMes, onAsignar, categori
       ) : (
         <div className="list-box">
           {presupuesto.map((p) => {
-            const disponible = Number(p.montoAsignado) - Number(p.gastado);
+            const disponible = Number(p.disponible);
             return (
               <div key={p.categoriaId} className="budget-row">
                 <span className="budget-nombre">{p.categoriaNombre}</span>
