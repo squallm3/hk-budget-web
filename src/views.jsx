@@ -182,12 +182,12 @@ export function AccountsView({ cuentas, balanceOf, onAdd, onEdit, onDelete }) {
 export function AccountForm({ initial, onCancel, onSave, saving }) {
   const [nombre, setNombre] = useState(initial?.nombre || '');
   const [tipo, setTipo] = useState(initial?.tipo || 'checking');
-  const [saldoInicial, setSaldoInicial] = useState(initial?.saldoInicial ?? 0);
+  const [monto, setMonto] = useState(initial ? (initial.saldoActual ?? initial.saldoInicial ?? 0) : 0);
 
   const submit = (e) => {
     e.preventDefault();
     if (!nombre.trim()) return;
-    onSave({ id: initial?.id, nombre: nombre.trim(), tipo, saldoInicial: Number(saldoInicial) || 0 });
+    onSave({ id: initial?.id, nombre: nombre.trim(), tipo, monto: Number(monto) || 0 });
   };
 
   return (
@@ -203,8 +203,8 @@ export function AccountForm({ initial, onCancel, onSave, saving }) {
             ))}
           </select>
         </Field>
-        <Field label="Saldo inicial">
-          <input type="number" value={saldoInicial} onChange={(e) => setSaldoInicial(e.target.value)} />
+        <Field label={initial ? 'Saldo actual' : 'Saldo inicial'}>
+          <input type="number" value={monto} onChange={(e) => setMonto(e.target.value)} />
         </Field>
         <div className="modal-actions">
           <button type="button" className="btn ghost" onClick={onCancel}>Cancelar</button>

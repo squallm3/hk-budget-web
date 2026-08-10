@@ -127,10 +127,14 @@ export default function App() {
   const guardarCuenta = (data) =>
     withSaving(async () => {
       if (data.id) {
-        const actualizada = await api.editarCuenta(data.id, data);
+        const sumaTransacciones = transacciones
+          .filter((t) => t.cuentaId === data.id)
+          .reduce((s, t) => s + Number(t.monto), 0);
+        const nuevoSaldoInicial = data.monto - sumaTransacciones;
+        const actualizada = await api.editarCuenta(data.id, { nombre: data.nombre, tipo: data.tipo, saldoInicial: nuevoSaldoInicial });
         setCuentas((prev) => prev.map((c) => (c.id === data.id ? actualizada : c)));
       } else {
-        const nueva = await api.crearCuenta(data);
+        const nueva = await api.crearCuenta({ nombre: data.nombre, tipo: data.tipo, saldoInicial: data.monto });
         setCuentas((prev) => [...prev, nueva]);
         api.sumarXp(111).catch((err) => console.error('No se pudo sumar XP', err));
         mostrarXpToast();
@@ -272,7 +276,7 @@ export default function App() {
                 cuentas={cuentas}
                 balanceOf={balanceOf}
                 onAdd={() => setAccountModal('new')}
-                onEdit={(c) => setAccountModal(c)}
+                onEdit={(c) => setAccountModal({ ...c, saldoActual: balanceOf(c.id) })}
                 onDelete={(c) => setConfirmDelete({ type: 'cuenta', id: c.id, label: c.nombre })}
               />
             )}
