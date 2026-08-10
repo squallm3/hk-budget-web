@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hk-budget-web-v2';
+const CACHE_NAME = 'hk-budget-web-v3';
 const APP_SHELL = ['/', '/manifest.json', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', (event) => {
@@ -20,7 +20,13 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Nunca cachear llamadas a la API (siempre tienen que ir a la red, son datos en vivo)
+  // Nunca tocar llamadas a la API, aunque compartan el mismo dominio que la app
+  // (siempre tienen que ir a la red en vivo, nunca servirse desde caché ni desde el shell)
+  if (url.pathname.startsWith('/api/')) {
+    return;
+  }
+
+  // Nunca cachear pedidos a otro origen (imágenes de la tienda, etc.)
   if (url.origin !== self.location.origin) {
     return;
   }
