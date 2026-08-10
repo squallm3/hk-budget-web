@@ -47,18 +47,34 @@ function EmptyState({ title, hint, action }) {
 }
 
 // ---------- Dashboard ----------
-export function Dashboard({ cuentas, categorias, transacciones, balanceOf, categorySpent, totalBalance }) {
+export function Dashboard({ cuentas, categorias, transacciones, balanceOf, categorySpent, totalBalance, presupuesto }) {
   const recientes = [...transacciones].sort((a, b) => (a.fecha < b.fecha ? 1 : -1)).slice(0, 5);
   const topCategorias = categorias
     .map((c) => ({ ...c, gastado: categorySpent(c.id) }))
     .filter((c) => c.gastado > 0)
     .sort((a, b) => b.gastado - a.gastado)
     .slice(0, 5);
+  const totalDisponibleAcumulado = presupuesto.reduce((s, p) => s + Number(p.disponible), 0);
+  const sinAsignar = totalBalance - totalDisponibleAcumulado;
 
   return (
     <div>
       <h2 className="view-title">Panel</h2>
       <p className="view-sub">Un vistazo rápido a tu plata.</p>
+
+      <div className={`sin-asignar-banner ${sinAsignar < 0 ? 'sobregirado' : sinAsignar === 0 ? 'completo' : ''}`}>
+        <p className="sin-asignar-label">
+          {sinAsignar < 0 ? 'Asignaste de más' : sinAsignar === 0 ? 'Todo asignado' : 'Sin asignar este mes'}
+        </p>
+        <p className="sin-asignar-value">{currency(Math.abs(sinAsignar))}</p>
+        <p className="sin-asignar-hint">
+          {sinAsignar < 0
+            ? 'Sacale plata a alguna categoría para volver a cuadrar.'
+            : sinAsignar === 0
+            ? 'Le diste un destino a cada peso que tenés.'
+            : 'Andá a Presupuesto para asignarle un destino a esta plata.'}
+        </p>
+      </div>
 
       <div className="cards-row">
         <div className="card total">

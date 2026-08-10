@@ -253,6 +253,7 @@ export default function App() {
                 balanceOf={balanceOf}
                 categorySpent={categorySpent}
                 totalBalance={totalBalance}
+                presupuesto={presupuesto}
               />
             )}
             {view === 'presupuesto' && (
