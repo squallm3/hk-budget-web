@@ -9,11 +9,14 @@ import {
   CategoryForm,
   TransactionsView,
   TransactionForm,
+  BudgetView,
+  mesActualISO,
   Modal,
 } from './views.jsx';
 
 const NAV = [
   { key: 'dashboard', label: 'Panel' },
+  { key: 'presupuesto', label: 'Presupuesto' },
   { key: 'cuentas', label: 'Cuentas' },
   { key: 'categorias', label: 'Categorías' },
   { key: 'transacciones', label: 'Transacciones' },
@@ -29,6 +32,10 @@ export default function App() {
   const [cuentas, setCuentas] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [transacciones, setTransacciones] = useState([]);
+
+  const [mes, setMes] = useState(mesActualISO());
+  const [presupuesto, setPresupuesto] = useState([]);
+  const [cargandoPresupuesto, setCargandoPresupuesto] = useState(false);
 
   const [accountModal, setAccountModal] = useState(null);
   const [categoryModal, setCategoryModal] = useState(null);
@@ -71,6 +78,22 @@ export default function App() {
       }
     })();
   }, [usuario]);
+
+  useEffect(() => {
+    if (!usuario) return;
+    (async () => {
+      setCargandoPresupuesto(true);
+      setErrorGlobal('');
+      try {
+        const p = await api.listarPresupuesto(mes);
+        setPresupuesto(p);
+      } catch (err) {
+        setErrorGlobal(err.message);
+      } finally {
+        setCargandoPresupuesto(false);
+      }
+    })();
+  }, [usuario, mes]);
 
   const balanceOf = (cuentaId) => {
     const cuenta = cuentas.find((c) => c.id === cuentaId);
@@ -141,6 +164,18 @@ export default function App() {
         mostrarXpToast();
       }
       setTxModal(null);
+      // el gasto recién cargado puede afectar el "gastado" del mes actual, refrescamos
+      if (mes === (data.fecha || '').slice(0, 7)) {
+        api.listarPresupuesto(mes).then(setPresupuesto).catch(() => {});
+      }
+    });
+
+  const asignarPresupuesto = (categoriaId, montoAsignado) =>
+    withSaving(async () => {
+      await api.asignarPresupuesto(categoriaId, mes, montoAsignado);
+      setPresupuesto((prev) =>
+        prev.map((p) => (p.categoriaId === categoriaId ? { ...p, montoAsignado } : p))
+      );
     });
 
   const confirmarEliminar = () =>
@@ -218,6 +253,16 @@ export default function App() {
                 balanceOf={balanceOf}
                 categorySpent={categorySpent}
                 totalBalance={totalBalance}
+              />
+            )}
+            {view === 'presupuesto' && (
+              <BudgetView
+                presupuesto={presupuesto}
+                mes={mes}
+                onCambiarMes={setMes}
+                onAsignar={asignarPresupuesto}
+                categorias={categorias}
+                saving={saving || cargandoPresupuesto}
               />
             )}
             {view === 'cuentas' && (

@@ -1,6 +1,6 @@
 {
-  "workbench.colorTheme": "Default Dark Modern",
-  "workbench.preferredDarkColorTheme": "Default Dark Modern",
+  "workbench.colorTheme": "Dark Modern",
+  "workbench.preferredDarkColorTheme": "Dark Modern",
   "workbench.colorCustomizations": {
     "editor.background": "#0e0b1a",
     "editor.foreground": "#f0e0ff",

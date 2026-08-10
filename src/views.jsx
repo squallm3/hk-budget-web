@@ -373,3 +373,92 @@ export function TransactionForm({ initial, cuentas, categorias, onCancel, onSave
     </Modal>
   );
 }
+
+// ---------- Presupuesto (asignación por categoría y mes) ----------
+export function mesActualISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+export function nombreMes(mesISO) {
+  const [anio, mes] = mesISO.split('-').map(Number);
+  const fecha = new Date(anio, mes - 1, 1);
+  const nombre = fecha.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+  return nombre.charAt(0).toUpperCase() + nombre.slice(1);
+}
+
+function sumarMes(mesISO, delta) {
+  const [anio, mes] = mesISO.split('-').map(Number);
+  const fecha = new Date(anio, mes - 1 + delta, 1);
+  return `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}`;
+}
+
+export function BudgetView({ presupuesto, mes, onCambiarMes, onAsignar, categorias, saving }) {
+  const totalAsignado = presupuesto.reduce((s, p) => s + Number(p.montoAsignado), 0);
+  const totalGastado = presupuesto.reduce((s, p) => s + Number(p.gastado), 0);
+
+  return (
+    <div>
+      <div className="top-bar">
+        <div>
+          <h2 className="view-title">Presupuesto</h2>
+          <p className="view-sub">Asignale un destino a cada peso, mes a mes.</p>
+        </div>
+        <div className="month-switch">
+          <button className="icon-btn" onClick={() => onCambiarMes(sumarMes(mes, -1))}>◀</button>
+          <span className="month-label">{nombreMes(mes)}</span>
+          <button className="icon-btn" onClick={() => onCambiarMes(sumarMes(mes, 1))}>▶</button>
+        </div>
+      </div>
+
+      <div className="cards-row">
+        <div className="card">
+          <p className="label">Asignado</p>
+          <p className="value">{currency(totalAsignado)}</p>
+        </div>
+        <div className="card">
+          <p className="label">Gastado</p>
+          <p className="value" style={{ color: 'var(--coral)' }}>{currency(totalGastado)}</p>
+        </div>
+        <div className="card total">
+          <p className="label">Disponible</p>
+          <p className="value">{currency(totalAsignado - totalGastado)}</p>
+        </div>
+      </div>
+
+      {categorias.length === 0 ? (
+        <EmptyState
+          title="Todavía no tenés categorías"
+          hint="Creá categorías en la sección Categorías antes de asignarles presupuesto."
+        />
+      ) : (
+        <div className="list-box">
+          {presupuesto.map((p) => {
+            const disponible = Number(p.montoAsignado) - Number(p.gastado);
+            return (
+              <div key={p.categoriaId} className="budget-row">
+                <span className="budget-nombre">{p.categoriaNombre}</span>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  className="budget-input"
+                  defaultValue={p.montoAsignado}
+                  onBlur={(e) => {
+                    const valor = Number(e.target.value) || 0;
+                    if (valor !== Number(p.montoAsignado)) onAsignar(p.categoriaId, valor);
+                  }}
+                  disabled={saving}
+                />
+                <span className="budget-gastado">{currency(p.gastado)}</span>
+                <span className={`budget-disponible ${disponible < 0 ? 'neg' : ''}`}>
+                  {currency(disponible)}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}

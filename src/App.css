@@ -200,3 +200,65 @@ main { flex: 1; padding: 24px; padding-bottom: 80px; }
   to { opacity: 1; transform: translate(-50%, 0); }
 }
 
+/* Presupuesto */
+.month-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  padding: 4px 6px;
+}
+.month-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto);
+  min-width: 130px;
+  text-align: center;
+}
+
+.budget-row {
+  display: grid;
+  grid-template-columns: 1fr 90px 90px 90px;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--borde);
+}
+.budget-row:last-child { border-bottom: none; }
+.budget-nombre { font-size: 14px; }
+.budget-input {
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 13px;
+  color: var(--texto);
+  font-family: 'IBM Plex Mono', monospace;
+  width: 100%;
+}
+.budget-gastado {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  color: var(--coral);
+  text-align: right;
+}
+.budget-disponible {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  color: var(--sage);
+  text-align: right;
+  font-weight: 600;
+}
+.budget-disponible.neg { color: var(--coral); }
+
+@media (max-width: 640px) {
+  .budget-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .budget-gastado::before { content: 'Gastado: '; color: var(--muted); }
+  .budget-disponible::before { content: 'Disponible: '; color: var(--muted); }
+  .budget-gastado, .budget-disponible { text-align: left; }
+}
