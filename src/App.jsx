@@ -56,17 +56,25 @@ export default function App() {
   };
 
   useEffect(() => {
-    // Al volver del login por redirect, procesamos el resultado.
-    // Si algo fallo en el camino, mostramos el error en pantalla.
-    procesarResultadoRedirect().catch((err) => {
-      setErrorGlobal(err.message);
-    });
+    let unsubscribe = () => {};
 
-    const unsubscribe = suscribirseAUsuario((u) => {
-      setUsuario(u);
-      setCargandoAuth(false);
-    });
-    return unsubscribe;
+    (async () => {
+      try {
+        // Al volver del login por redirect, esperamos a que Firebase termine de
+        // procesar el resultado ANTES de decidir que pantalla mostrar.
+        // Si no esperamos, la app cree que no hay sesion y vuelve al login.
+        await procesarResultadoRedirect();
+      } catch (err) {
+        setErrorGlobal(err.message);
+      }
+
+      unsubscribe = suscribirseAUsuario((u) => {
+        setUsuario(u);
+        setCargandoAuth(false);
+      });
+    })();
+
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
