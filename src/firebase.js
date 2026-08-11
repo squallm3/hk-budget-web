@@ -1,5 +1,12 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithRedirect,
+  getRedirectResult,
+  signOut,
+  onAuthStateChanged,
+} from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -15,8 +22,19 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
+// Login por redirect (no por popup).
+// El popup se cuelga en Chrome/Edge cuando Google necesita mostrar el selector
+// de cuentas ya logueadas, porque depende de cookies de Google en contexto de
+// terceros, que los navegadores ahora particionan. El redirect navega en la
+// misma pestana, sin ese problema.
 export function loginConGoogle() {
-  return signInWithPopup(auth, googleProvider);
+  return signInWithRedirect(auth, googleProvider);
+}
+
+// Al volver del redirect, Firebase necesita procesar el resultado.
+// Si hubo un error en el proceso, lo devolvemos para poder mostrarlo.
+export function procesarResultadoRedirect() {
+  return getRedirectResult(auth);
 }
 
 export function logout() {

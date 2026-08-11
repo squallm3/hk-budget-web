@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { loginConGoogle, logout, suscribirseAUsuario } from './firebase.js';
+import { loginConGoogle, logout, suscribirseAUsuario, procesarResultadoRedirect } from './firebase.js';
 import * as api from './api.js';
 import {
   Dashboard,
@@ -56,6 +56,12 @@ export default function App() {
   };
 
   useEffect(() => {
+    // Al volver del login por redirect, procesamos el resultado.
+    // Si algo fallo en el camino, mostramos el error en pantalla.
+    procesarResultadoRedirect().catch((err) => {
+      setErrorGlobal(err.message);
+    });
+
     const unsubscribe = suscribirseAUsuario((u) => {
       setUsuario(u);
       setCargandoAuth(false);
