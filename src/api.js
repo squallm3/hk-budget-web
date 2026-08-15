@@ -48,3 +48,8 @@ export const listarTransacciones = () => authFetch('/api/transacciones');
 export const crearTransaccion = (data) => authFetch('/api/transacciones', { method: 'POST', body: JSON.stringify(data) });
 export const editarTransaccion = (id, data) => authFetch(`/api/transacciones/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 export const eliminarTransaccion = (id) => authFetch(`/api/transacciones/${id}`, { method: 'DELETE' });
+
+// Presupuesto por categoría y mes
+export const listarPresupuesto = (mes) => authFetch(`/api/presupuesto?mes=${mes}`);
+export const asignarPresupuesto = (categoriaId, mes, montoAsignado) =>
+  authFetch('/api/presupuesto', { method: 'POST', body: JSON.stringify({ categoriaId, mes, montoAsignado }) });
