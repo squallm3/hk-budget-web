@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { loginConGoogle, logout, suscribirseAUsuario, procesarResultadoRedirect } from './firebase.js';
+import { loginConGoogle, logout, suscribirseAUsuario } from './firebase.js';
 import * as api from './api.js';
 import {
   Dashboard,
@@ -56,25 +56,11 @@ export default function App() {
   };
 
   useEffect(() => {
-    let unsubscribe = () => {};
-
-    (async () => {
-      try {
-        // Al volver del login por redirect, esperamos a que Firebase termine de
-        // procesar el resultado ANTES de decidir que pantalla mostrar.
-        // Si no esperamos, la app cree que no hay sesion y vuelve al login.
-        await procesarResultadoRedirect();
-      } catch (err) {
-        setErrorGlobal(err.message);
-      }
-
-      unsubscribe = suscribirseAUsuario((u) => {
-        setUsuario(u);
-        setCargandoAuth(false);
-      });
-    })();
-
-    return () => unsubscribe();
+    const unsubscribe = suscribirseAUsuario((u) => {
+      setUsuario(u);
+      setCargandoAuth(false);
+    });
+    return unsubscribe;
   }, []);
 
   useEffect(() => {
