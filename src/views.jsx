@@ -480,6 +480,11 @@ export function BudgetView({ presupuesto, mes, onCambiarMes, onAsignar, categori
                     const valor = Number(e.target.value) || 0;
                     if (valor !== Number(p.montoAsignado)) onAsignar(p.categoriaId, valor);
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.target.blur();
+                    }
+                  }}
                   disabled={saving}
                 />
                 <span className="budget-gastado">{currency(p.gastado)}</span>

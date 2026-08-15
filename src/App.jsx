@@ -201,9 +201,7 @@ export default function App() {
   const asignarPresupuesto = (categoriaId, montoAsignado) =>
     withSaving(async () => {
       await api.asignarPresupuesto(categoriaId, mes, montoAsignado);
-      setPresupuesto((prev) =>
-        prev.map((p) => (p.categoriaId === categoriaId ? { ...p, montoAsignado } : p))
-      );
+      await cargarPresupuesto(mes);
     });
 
   const confirmarEliminar = () =>
