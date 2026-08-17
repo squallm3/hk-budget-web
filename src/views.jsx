@@ -203,7 +203,7 @@ function TxRow({ t }) {
 }
 
 // ---------- Cuentas ----------
-export function AccountsView({ cuentas, balanceOf, onAdd, onEdit, onDelete, onTransfer }) {
+export function AccountsView({ cuentas, balanceOf, onAdd, onEdit, onDelete, onTransfer, onReconcile }) {
   return (
     <div>
       <div className="top-bar">
@@ -231,6 +231,7 @@ export function AccountsView({ cuentas, balanceOf, onAdd, onEdit, onDelete, onTr
               <p className="saldo-tile">{currency(balanceOf(c.id))}</p>
               <div className="tile-actions">
                 <button className="icon-btn" onClick={() => onEdit(c)}>✎</button>
+                <button className="icon-btn" onClick={() => onReconcile(c)} title="Conciliar saldo">⚖</button>
                 <button className="icon-btn danger" onClick={() => onDelete(c)}>🗑</button>
               </div>
             </div>
@@ -332,6 +333,50 @@ export function TransferForm({ cuentas, onCancel, onSave, saving }) {
         <div className="modal-actions">
           <button type="button" className="btn ghost" onClick={onCancel}>Cancelar</button>
           <button type="submit" className="btn" disabled={saving}>{saving ? 'Transfiriendo...' : 'Transferir'}</button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+export function ReconcileForm({ cuenta, saldoActual, onCancel, onSave, saving }) {
+  const [saldoReal, setSaldoReal] = useState(saldoActual);
+  const diferencia = Number(saldoReal) - Number(saldoActual);
+
+  const submit = (e) => {
+    e.preventDefault();
+    onSave({ cuentaId: cuenta.id, diferencia, saldoReal: Number(saldoReal) });
+  };
+
+  return (
+    <Modal title={`Conciliar "${cuenta.nombre}"`} onClose={onCancel}>
+      <form onSubmit={submit}>
+        <p className="muted small" style={{ marginBottom: 14 }}>
+          El sistema calcula {currency(saldoActual)} para esta cuenta. Poné el saldo real que ves
+          en el banco/billetera y la app crea sola un ajuste por la diferencia.
+        </p>
+        <Field label="Saldo real">
+          <input
+            type="number"
+            step="0.01"
+            value={saldoReal}
+            onChange={(e) => setSaldoReal(e.target.value)}
+            autoFocus
+          />
+        </Field>
+        {diferencia !== 0 && (
+          <p className={diferencia > 0 ? 'estado-partida-faltante' : 'error'} style={{ marginBottom: 14 }}>
+            Se va a crear un ajuste de {diferencia > 0 ? '+' : ''}{currency(diferencia)}.
+          </p>
+        )}
+        {diferencia === 0 && (
+          <p className="muted small" style={{ marginBottom: 14 }}>Ya está todo conciliado, no hace falta ningún ajuste.</p>
+        )}
+        <div className="modal-actions">
+          <button type="button" className="btn ghost" onClick={onCancel}>Cancelar</button>
+          <button type="submit" className="btn" disabled={saving || diferencia === 0}>
+            {saving ? 'Conciliando...' : 'Conciliar'}
+          </button>
         </div>
       </form>
     </Modal>
