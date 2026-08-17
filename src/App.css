@@ -414,7 +414,6 @@ main { flex: 1; padding: 24px; }
 @media (min-width: 640px) {
   .personaje-links { flex-direction: row; }
 }
-
 /* Estado de la partida (Panel) */
 .estado-partida {
   background: var(--superficie);
@@ -474,4 +473,9 @@ main { flex: 1; padding: 24px; }
 .estado-partida-botones .btn {
   font-size: 13px;
   padding: 8px 14px;
+}
+
+.top-bar-actions {
+  display: flex;
+  gap: 8px;
 }

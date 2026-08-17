@@ -9,6 +9,7 @@ import {
   CategoryForm,
   TransactionsView,
   TransactionForm,
+  TransferForm,
   BudgetView,
   PersonajeView,
   mesActualISO,
@@ -46,6 +47,7 @@ export default function App() {
   const [accountModal, setAccountModal] = useState(null);
   const [categoryModal, setCategoryModal] = useState(null);
   const [txModal, setTxModal] = useState(null);
+  const [transferModal, setTransferModal] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [saving, setSaving] = useState(false);
   const [xpToast, setXpToast] = useState(false);
@@ -200,6 +202,13 @@ export default function App() {
       }
     });
 
+  const guardarTransferencia = (data) =>
+    withSaving(async () => {
+      const resultado = await api.transferir(data);
+      setTransacciones((prev) => [resultado.entrada, resultado.salida, ...prev]);
+      setTransferModal(false);
+    });
+
   const asignarPresupuesto = (categoriaId, montoAsignado) =>
     withSaving(async () => {
       await api.asignarPresupuesto(categoriaId, mes, montoAsignado);
@@ -316,6 +325,7 @@ export default function App() {
                 onAdd={() => setAccountModal('new')}
                 onEdit={(c) => setAccountModal({ ...c, saldoActual: balanceOf(c.id) })}
                 onDelete={(c) => setConfirmDelete({ type: 'cuenta', id: c.id, label: c.nombre })}
+                onTransfer={() => setTransferModal(true)}
               />
             )}
             {view === 'categorias' && (
@@ -404,6 +414,14 @@ export default function App() {
           categorias={categorias}
           onCancel={() => setTxModal(null)}
           onSave={guardarTransaccion}
+          saving={saving}
+        />
+      )}
+      {transferModal && (
+        <TransferForm
+          cuentas={cuentas}
+          onCancel={() => setTransferModal(false)}
+          onSave={guardarTransferencia}
           saving={saving}
         />
       )}

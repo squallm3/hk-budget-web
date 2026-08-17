@@ -203,7 +203,7 @@ function TxRow({ t }) {
 }
 
 // ---------- Cuentas ----------
-export function AccountsView({ cuentas, balanceOf, onAdd, onEdit, onDelete }) {
+export function AccountsView({ cuentas, balanceOf, onAdd, onEdit, onDelete, onTransfer }) {
   return (
     <div>
       <div className="top-bar">
@@ -211,7 +211,10 @@ export function AccountsView({ cuentas, balanceOf, onAdd, onEdit, onDelete }) {
           <h2 className="view-title">Cuentas</h2>
           <p className="view-sub">Dónde vive tu plata.</p>
         </div>
-        <button className="btn" onClick={onAdd}>+ Nueva cuenta</button>
+        <div className="top-bar-actions">
+          <button className="btn ghost" onClick={onTransfer} disabled={cuentas.length < 2}>⇄ Transferir</button>
+          <button className="btn" onClick={onAdd}>+ Nueva cuenta</button>
+        </div>
       </div>
       {cuentas.length === 0 ? (
         <EmptyState
@@ -268,6 +271,67 @@ export function AccountForm({ initial, onCancel, onSave, saving }) {
         <div className="modal-actions">
           <button type="button" className="btn ghost" onClick={onCancel}>Cancelar</button>
           <button type="submit" className="btn" disabled={saving}>{saving ? 'Guardando...' : 'Guardar'}</button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+export function TransferForm({ cuentas, onCancel, onSave, saving }) {
+  const [cuentaOrigenId, setCuentaOrigenId] = useState(cuentas[0]?.id || '');
+  const [cuentaDestinoId, setCuentaDestinoId] = useState(cuentas[1]?.id || cuentas[0]?.id || '');
+  const [monto, setMonto] = useState('');
+  const [fecha, setFecha] = useState(todayISO());
+  const [nota, setNota] = useState('');
+  const [error, setError] = useState('');
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (!monto || Number(monto) <= 0) return;
+    if (cuentaOrigenId === cuentaDestinoId) {
+      setError('La cuenta de origen y destino no pueden ser la misma.');
+      return;
+    }
+    setError('');
+    onSave({
+      cuentaOrigenId: Number(cuentaOrigenId),
+      cuentaDestinoId: Number(cuentaDestinoId),
+      monto: Number(monto),
+      fecha,
+      nota: nota.trim(),
+    });
+  };
+
+  return (
+    <Modal title="Transferir entre cuentas" onClose={onCancel}>
+      <form onSubmit={submit}>
+        <Field label="Desde">
+          <select value={cuentaOrigenId} onChange={(e) => setCuentaOrigenId(e.target.value)}>
+            {cuentas.map((c) => (
+              <option key={c.id} value={c.id}>{c.nombre}</option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Hacia">
+          <select value={cuentaDestinoId} onChange={(e) => setCuentaDestinoId(e.target.value)}>
+            {cuentas.map((c) => (
+              <option key={c.id} value={c.id}>{c.nombre}</option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Monto">
+          <input type="number" step="0.01" min="0" value={monto} onChange={(e) => setMonto(e.target.value)} autoFocus />
+        </Field>
+        <Field label="Fecha">
+          <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+        </Field>
+        <Field label="Nota (opcional)">
+          <input value={nota} onChange={(e) => setNota(e.target.value)} />
+        </Field>
+        {error && <p className="error">{error}</p>}
+        <div className="modal-actions">
+          <button type="button" className="btn ghost" onClick={onCancel}>Cancelar</button>
+          <button type="submit" className="btn" disabled={saving}>{saving ? 'Transfiriendo...' : 'Transferir'}</button>
         </div>
       </form>
     </Modal>

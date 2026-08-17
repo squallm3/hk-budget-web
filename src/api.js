@@ -49,6 +49,9 @@ export const listarPresupuesto = (mes) => authFetch(`/api/presupuesto?mes=${mes}
 export const asignarPresupuesto = (categoriaId, mes, montoAsignado) =>
   authFetch('/api/presupuesto', { method: 'POST', body: JSON.stringify({ categoriaId, mes, montoAsignado }) });
 
+// Transferencias entre cuentas (atómico, todo o nada, en el backend)
+export const transferir = (data) => authFetch('/api/transferencias', { method: 'POST', body: JSON.stringify(data) });
+
 // Transacciones
 export const listarTransacciones = () => authFetch('/api/transacciones');
 export const crearTransaccion = (data) => authFetch('/api/transacciones', { method: 'POST', body: JSON.stringify(data) });
