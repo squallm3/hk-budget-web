@@ -41,6 +41,7 @@ export default function App() {
 
   const [personaje, setPersonaje] = useState(null);
   const [cargandoPersonaje, setCargandoPersonaje] = useState(false);
+  const [niveles, setNiveles] = useState([]);
 
   const [accountModal, setAccountModal] = useState(null);
   const [categoryModal, setCategoryModal] = useState(null);
@@ -90,8 +91,9 @@ export default function App() {
     (async () => {
       setCargandoPersonaje(true);
       try {
-        const p = await api.obtenerPersonaje();
+        const [p, nv] = await Promise.all([api.obtenerPersonaje(), api.listarNiveles()]);
         setPersonaje(p);
+        setNiveles(nv);
       } catch (err) {
         console.error('No se pudo cargar el personaje', err);
       } finally {
@@ -201,7 +203,9 @@ export default function App() {
   const asignarPresupuesto = (categoriaId, montoAsignado) =>
     withSaving(async () => {
       await api.asignarPresupuesto(categoriaId, mes, montoAsignado);
-      await cargarPresupuesto(mes);
+      setPresupuesto((prev) =>
+        prev.map((p) => (p.categoriaId === categoriaId ? { ...p, montoAsignado } : p))
+      );
     });
 
   const confirmarEliminar = () =>
@@ -288,6 +292,10 @@ export default function App() {
                 categorySpent={categorySpent}
                 totalBalance={totalBalance}
                 presupuesto={presupuesto}
+                personaje={personaje}
+                niveles={niveles}
+                onVerDetallesPersonaje={() => setView('personaje')}
+                onCerrarSesion={logout}
               />
             )}
             {view === 'presupuesto' && (

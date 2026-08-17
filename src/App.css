@@ -414,3 +414,64 @@ main { flex: 1; padding: 24px; }
 @media (min-width: 640px) {
   .personaje-links { flex-direction: row; }
 }
+
+/* Estado de la partida (Panel) */
+.estado-partida {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+.estado-partida-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 13px;
+  color: var(--texto-secundario);
+  margin-bottom: 4px;
+}
+.estado-partida-titulo {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--acento-claro);
+  margin: 0 0 10px;
+}
+.estado-partida-track {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.estado-partida-fill {
+  height: 100%;
+  background: var(--sage);
+}
+.estado-partida-faltante {
+  font-size: 12px;
+  color: var(--texto-secundario);
+  margin: 0 0 10px;
+}
+.estado-partida-detalles {
+  background: transparent;
+  border: none;
+  color: var(--acento-claro);
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 14px;
+  display: inline-block;
+}
+.estado-partida-botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.estado-partida-botones .btn {
+  font-size: 13px;
+  padding: 8px 14px;
+}

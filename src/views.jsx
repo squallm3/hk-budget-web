@@ -47,7 +47,58 @@ function EmptyState({ title, hint, action }) {
 }
 
 // ---------- Dashboard ----------
-export function Dashboard({ cuentas, categorias, transacciones, balanceOf, categorySpent, totalBalance, presupuesto }) {
+const TIENDA_MIS_ARTICULOS_URL = 'https://haikusgnosticos.duckdns.org/tienda/niveles';
+const TIENDA_OTROS_URL = 'https://haikusgnosticos.duckdns.org/';
+
+function EstadoPartida({ personaje, niveles, onVerDetalles, onCerrarSesion }) {
+  if (!personaje || !niveles || niveles.length === 0) {
+    return null;
+  }
+
+  const xpActual = Number(personaje.xpAcumulada) || 0;
+  const nivelActual = niveles.find((n) => n.id === personaje.nivelId);
+  const nivelSiguiente = niveles.find((n) => n.id === personaje.nivelId + 1);
+
+  const faltante = nivelSiguiente ? Number(nivelSiguiente.xpAcumulada) - xpActual : 0;
+  const porcentaje =
+    nivelActual && nivelSiguiente
+      ? Math.min(
+          100,
+          Math.max(
+            0,
+            ((xpActual - Number(nivelActual.xpAcumulada)) /
+              (Number(nivelSiguiente.xpAcumulada) - Number(nivelActual.xpAcumulada))) *
+              100
+          )
+        )
+      : 100;
+
+  return (
+    <div className="estado-partida">
+      <div className="estado-partida-header">
+        <span>Nivel {personaje.nivelId}</span>
+        <span className="mono">{xpActual.toLocaleString('es-AR')} XP</span>
+      </div>
+      <p className="estado-partida-titulo">{personaje.titulo}</p>
+      <div className="estado-partida-track">
+        <div className="estado-partida-fill" style={{ width: `${porcentaje}%` }} />
+      </div>
+      <p className="estado-partida-faltante">
+        {nivelSiguiente
+          ? `${faltante.toLocaleString('es-AR')} XP para el nivel ${personaje.nivelId + 1}`
+          : 'Nivel máximo alcanzado'}
+      </p>
+      <button className="estado-partida-detalles" onClick={onVerDetalles}>Click para más detalles</button>
+      <div className="estado-partida-botones">
+        <a className="btn ghost" href={TIENDA_MIS_ARTICULOS_URL} target="_blank" rel="noopener noreferrer">Mis artículos</a>
+        <a className="btn ghost" href={TIENDA_OTROS_URL} target="_blank" rel="noopener noreferrer">Otros</a>
+        <button className="btn ghost" onClick={onCerrarSesion}>Cerrar sesión</button>
+      </div>
+    </div>
+  );
+}
+
+export function Dashboard({ cuentas, categorias, transacciones, balanceOf, categorySpent, totalBalance, presupuesto, personaje, niveles, onVerDetallesPersonaje, onCerrarSesion }) {
   const recientes = [...transacciones].sort((a, b) => (a.fecha < b.fecha ? 1 : -1)).slice(0, 5);
   const topCategorias = categorias
     .map((c) => ({ ...c, gastado: categorySpent(c.id) }))
@@ -62,6 +113,13 @@ export function Dashboard({ cuentas, categorias, transacciones, balanceOf, categ
       <h2 className="view-title">Panel</h2>
       <p className="view-sub">Un vistazo rápido a tu plata.</p>
 
+      <EstadoPartida
+        personaje={personaje}
+        niveles={niveles}
+        onVerDetalles={onVerDetallesPersonaje}
+        onCerrarSesion={onCerrarSesion}
+      />
+
       <div className={`sin-asignar-banner ${sinAsignar < 0 ? 'sobregirado' : sinAsignar === 0 ? 'completo' : ''}`}>
         <p className="sin-asignar-label">
           {sinAsignar < 0 ? 'Asignaste de más' : sinAsignar === 0 ? 'Todo asignado' : 'Sin asignar este mes'}
@@ -73,6 +131,7 @@ export function Dashboard({ cuentas, categorias, transacciones, balanceOf, categ
             : sinAsignar === 0
             ? 'Le diste un destino a cada peso que tenés.'
             : 'Andá a Presupuesto para asignarle un destino a esta plata.'}
+
         </p>
       </div>
 
