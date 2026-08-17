@@ -10,6 +10,7 @@ import {
   TransactionsView,
   TransactionForm,
   TransferForm,
+  ReconcileForm,
   BudgetView,
   PersonajeView,
   mesActualISO,
@@ -48,6 +49,7 @@ export default function App() {
   const [categoryModal, setCategoryModal] = useState(null);
   const [txModal, setTxModal] = useState(null);
   const [transferModal, setTransferModal] = useState(false);
+  const [reconcileModal, setReconcileModal] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [saving, setSaving] = useState(false);
   const [xpToast, setXpToast] = useState(false);
@@ -209,6 +211,22 @@ export default function App() {
       setTransferModal(false);
     });
 
+  const guardarConciliacion = (data) =>
+    withSaving(async () => {
+      if (data.diferencia !== 0) {
+        const nueva = await api.crearTransaccion({
+          cuentaId: data.cuentaId,
+          categoriaId: null,
+          fecha: new Date().toISOString().slice(0, 10),
+          descripcion: 'Ajuste de conciliación',
+          monto: data.diferencia,
+          nota: `Saldo real ingresado: ${data.saldoReal}`,
+        });
+        setTransacciones((prev) => [nueva, ...prev]);
+      }
+      setReconcileModal(null);
+    });
+
   const asignarPresupuesto = (categoriaId, montoAsignado) =>
     withSaving(async () => {
       await api.asignarPresupuesto(categoriaId, mes, montoAsignado);
@@ -326,6 +344,7 @@ export default function App() {
                 onEdit={(c) => setAccountModal({ ...c, saldoActual: balanceOf(c.id) })}
                 onDelete={(c) => setConfirmDelete({ type: 'cuenta', id: c.id, label: c.nombre })}
                 onTransfer={() => setTransferModal(true)}
+                onReconcile={(c) => setReconcileModal({ ...c, saldoActual: balanceOf(c.id) })}
               />
             )}
             {view === 'categorias' && (
@@ -422,6 +441,15 @@ export default function App() {
           cuentas={cuentas}
           onCancel={() => setTransferModal(false)}
           onSave={guardarTransferencia}
+          saving={saving}
+        />
+      )}
+      {reconcileModal && (
+        <ReconcileForm
+          cuenta={reconcileModal}
+          saldoActual={reconcileModal.saldoActual}
+          onCancel={() => setReconcileModal(null)}
+          onSave={guardarConciliacion}
           saving={saving}
         />
       )}
