@@ -299,7 +299,7 @@ export default function App() {
         </nav>
         <div className="saldo">
           <p>Saldo total</p>
-          <p className="mono">{cargandoDatos ? '...' : new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(totalBalance)}</p>
+          <p className="mono">{cargandoDatos ? '...' : new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalBalance)}</p>
         </div>
         <button className="btn ghost logout" onClick={logout}>Cerrar sesión</button>
       </aside>
@@ -398,7 +398,7 @@ export default function App() {
               <p className="mono">
                 {cargandoDatos
                   ? '...'
-                  : new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(totalBalance)}
+                  : new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalBalance)}
               </p>
             </div>
             <button className="btn ghost logout" onClick={logout}>Cerrar sesión</button>

@@ -1,8 +1,7 @@
 import { useState } from 'react';
 
 export const currency = (n) =>
-  new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n || 0);
-
+new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n || 0);
 export const ACCOUNT_TYPES = [
   { value: 'checking', label: 'Cuenta corriente' },
   { value: 'savings', label: 'Caja de ahorro' },
