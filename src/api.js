@@ -44,6 +44,11 @@ export const crearCategoria = (data) => authFetch('/api/categorias-gasto', { met
 export const editarCategoria = (id, data) => authFetch(`/api/categorias-gasto/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 export const eliminarCategoria = (id) => authFetch(`/api/categorias-gasto/${id}`, { method: 'DELETE' });
 
+// Presupuesto por categoría y mes
+export const listarPresupuesto = (mes) => authFetch(`/api/presupuesto?mes=${mes}`);
+export const asignarPresupuesto = (categoriaId, mes, montoAsignado) =>
+  authFetch('/api/presupuesto', { method: 'POST', body: JSON.stringify({ categoriaId, mes, montoAsignado }) });
+
 // Transacciones
 export const listarTransacciones = () => authFetch('/api/transacciones');
 export const crearTransaccion = (data) => authFetch('/api/transacciones', { method: 'POST', body: JSON.stringify(data) });
