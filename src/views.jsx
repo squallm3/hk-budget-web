@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
 export const currency = (n) =>
-new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n || 0);
+  new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n || 0);
+
 export const ACCOUNT_TYPES = [
   { value: 'checking', label: 'Cuenta corriente' },
   { value: 'savings', label: 'Caja de ahorro' },
@@ -611,16 +612,16 @@ export function BudgetView({ presupuesto, mes, onCambiarMes, onAsignar, categori
       </div>
 
       <div className="cards-row">
-        <div className="card">
+        <div className="card asignado">
           <p className="label">Asignado</p>
           <p className="value">{currency(totalAsignado)}</p>
         </div>
-        <div className="card">
+        <div className="card gastado">
           <p className="label">Gastado</p>
-          <p className="value" style={{ color: 'var(--coral)' }}>{currency(totalGastado)}</p>
+          <p className="value">{currency(totalGastado)}</p>
         </div>
         <div className="card total">
-          <p className="label">Disponible</p>
+          <p className="label">Disponible para asignar</p>
           <p className="value">{currency(totalDisponibleAcumulado)}</p>
         </div>
       </div>
