@@ -318,7 +318,7 @@ main { flex: 1; padding: 24px; }
 }
 
 .sin-asignar-banner {
-  background: var(--sage);
+  background: #3b82f6;
   border-radius: 16px;
   padding: 18px 20px;
   margin-bottom: 20px;
@@ -342,15 +342,15 @@ main { flex: 1; padding: 24px; }
   color: rgba(255,255,255,0.75);
   margin: 0;
 }
-.sin-asignar-banner.completo { background: var(--sage); }
+.sin-asignar-banner.completo { background: #3b82f6; }
 .sin-asignar-banner.sobregirado { background: var(--coral); }
 
 .card.asignado {
-  background: rgba(59, 130, 246, 0.18);
-  border-color: #3b82f6;
+  background: #26262e;
+  border-color: #4a4a55;
 }
-.card.asignado .label { color: #93c5fd; }
-.card.asignado .value { color: #fff; }
+.card.asignado .label { color: #cfcfd6; }
+.card.asignado .value { color: #ffffff; }
 
 .card.gastado {
   background: var(--coral);
@@ -358,6 +358,13 @@ main { flex: 1; padding: 24px; }
 }
 .card.gastado .label { color: rgba(255,255,255,0.75); }
 .card.gastado .value { color: #fff; }
+
+.card.disponible {
+  background: var(--sage);
+  border-color: var(--sage);
+}
+.card.disponible .label { color: rgba(255,255,255,0.75); }
+.card.disponible .value { color: #fff; }
 
 /* Mi Personaje */
 .personaje-card {

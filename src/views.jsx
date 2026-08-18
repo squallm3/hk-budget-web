@@ -620,8 +620,8 @@ export function BudgetView({ presupuesto, mes, onCambiarMes, onAsignar, categori
           <p className="label">Gastado</p>
           <p className="value">{currency(totalGastado)}</p>
         </div>
-        <div className="card total">
-          <p className="label">Disponible para asignar</p>
+        <div className="card disponible">
+          <p className="label">Disponible</p>
           <p className="value">{currency(totalDisponibleAcumulado)}</p>
         </div>
       </div>
