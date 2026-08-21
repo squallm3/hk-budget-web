@@ -383,6 +383,44 @@ export function ReconcileForm({ cuenta, saldoActual, onCancel, onSave, saving })
   );
 }
 
+export function ReconcileCategoryForm({ presupuestoItem, cuentas, onCancel, onSave, saving }) {
+  const [cuentaId, setCuentaId] = useState(cuentas[0]?.id || '');
+  const disponible = Number(presupuestoItem.disponible);
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (!cuentaId) return;
+    onSave({ categoriaId: presupuestoItem.categoriaId, cuentaId: Number(cuentaId), monto: disponible });
+  };
+
+  return (
+    <Modal title={`Conciliar "${presupuestoItem.categoriaNombre}"`} onClose={onCancel}>
+      <form onSubmit={submit}>
+        <p className="muted small" style={{ marginBottom: 14 }}>
+          Esta categoría tiene {currency(disponible)} disponible sin gastar registrado. Elegí de qué
+          cuenta salió ese gasto y la app crea sola la transacción — Disponible va a quedar en $0.
+        </p>
+        <Field label="Cuenta de la que salió el gasto">
+          <select value={cuentaId} onChange={(e) => setCuentaId(e.target.value)}>
+            {cuentas.map((c) => (
+              <option key={c.id} value={c.id}>{c.nombre}</option>
+            ))}
+          </select>
+        </Field>
+        <p className="estado-partida-faltante" style={{ marginBottom: 14 }}>
+          Se va a registrar un gasto de {currency(disponible)} hoy en esta categoría.
+        </p>
+        <div className="modal-actions">
+          <button type="button" className="btn ghost" onClick={onCancel}>Cancelar</button>
+          <button type="submit" className="btn" disabled={saving || !cuentaId}>
+            {saving ? 'Conciliando...' : 'Registrar gasto'}
+          </button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
 // ---------- Categorías ----------
 export function CategoriesView({ categorias, categorySpent, onAdd, onEdit, onDelete }) {
   return (
@@ -577,7 +615,7 @@ function sumarMes(mesISO, delta) {
   return `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}`;
 }
 
-export function BudgetView({ presupuesto, mes, onCambiarMes, onAsignar, categorias, saving, totalBalance }) {
+export function BudgetView({ presupuesto, mes, onCambiarMes, onAsignar, categorias, saving, totalBalance, cuentas, onReconcileCategory }) {
   const totalAsignado = presupuesto.reduce((s, p) => s + Number(p.montoAsignado), 0);
   const totalGastado = presupuesto.reduce((s, p) => s + Number(p.gastado), 0);
   const totalDisponibleAcumulado = presupuesto.reduce((s, p) => s + Number(p.disponible), 0);
@@ -659,6 +697,14 @@ export function BudgetView({ presupuesto, mes, onCambiarMes, onAsignar, categori
                 <span className={`budget-disponible ${disponible < 0 ? 'neg' : ''}`}>
                   {currency(disponible)}
                 </span>
+                <button
+                  className="icon-btn budget-conciliar"
+                  title="Registrar gasto no cargado y llevar Disponible a $0"
+                  onClick={() => onReconcileCategory(p)}
+                  disabled={disponible <= 0}
+                >
+                  ⚖
+                </button>
               </div>
             );
           })}

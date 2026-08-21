@@ -274,7 +274,7 @@ main { flex: 1; padding: 24px; }
 
 .budget-row {
   display: grid;
-  grid-template-columns: 1fr 90px 90px 90px;
+  grid-template-columns: 1fr 90px 90px 90px 32px;
   align-items: center;
   gap: 10px;
   padding: 12px 18px;
@@ -499,4 +499,8 @@ main { flex: 1; padding: 24px; }
 .top-bar-actions {
   display: flex;
   gap: 8px;
+}
+
+.budget-conciliar {
+  font-size: 13px;
 }

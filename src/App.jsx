@@ -11,6 +11,7 @@ import {
   TransactionForm,
   TransferForm,
   ReconcileForm,
+  ReconcileCategoryForm,
   BudgetView,
   PersonajeView,
   mesActualISO,
@@ -50,6 +51,7 @@ export default function App() {
   const [txModal, setTxModal] = useState(null);
   const [transferModal, setTransferModal] = useState(false);
   const [reconcileModal, setReconcileModal] = useState(null);
+  const [reconcileCategoryModal, setReconcileCategoryModal] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [saving, setSaving] = useState(false);
   const [xpToast, setXpToast] = useState(false);
@@ -227,6 +229,21 @@ export default function App() {
       setReconcileModal(null);
     });
 
+  const guardarConciliacionCategoria = (data) =>
+    withSaving(async () => {
+      const nueva = await api.crearTransaccion({
+        cuentaId: data.cuentaId,
+        categoriaId: data.categoriaId,
+        fecha: new Date().toISOString().slice(0, 10),
+        descripcion: 'Gasto no registrado (conciliación)',
+        monto: -Math.abs(data.monto),
+        nota: '',
+      });
+      setTransacciones((prev) => [nueva, ...prev]);
+      await cargarPresupuesto(mes);
+      setReconcileCategoryModal(null);
+    });
+
   const asignarPresupuesto = (categoriaId, montoAsignado) =>
     withSaving(async () => {
       await api.asignarPresupuesto(categoriaId, mes, montoAsignado);
@@ -332,6 +349,8 @@ export default function App() {
                 categorias={categorias}
                 saving={saving || cargandoPresupuesto}
                 totalBalance={totalBalance}
+                cuentas={cuentas}
+                onReconcileCategory={(p) => setReconcileCategoryModal(p)}
               />
             )}
             {view === 'cuentas' && (
@@ -448,6 +467,15 @@ export default function App() {
           saldoActual={reconcileModal.saldoActual}
           onCancel={() => setReconcileModal(null)}
           onSave={guardarConciliacion}
+          saving={saving}
+        />
+      )}
+      {reconcileCategoryModal && (
+        <ReconcileCategoryForm
+          presupuestoItem={reconcileCategoryModal}
+          cuentas={cuentas}
+          onCancel={() => setReconcileCategoryModal(null)}
+          onSave={guardarConciliacionCategoria}
           saving={saving}
         />
       )}
