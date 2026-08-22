@@ -62,51 +62,25 @@ export default function App() {
     setTimeout(() => setXpToast(false), 2200);
   };
 
-  useEffect(() => {
-    const unsubscribe = suscribirseAUsuario((u) => {
-      setUsuario(u);
-      setCargandoAuth(false);
-    });
-    return unsubscribe;
-  }, []);
-
-  useEffect(() => {
-    if (!usuario) return;
-    (async () => {
-      setCargandoDatos(true);
-      setErrorGlobal('');
-      try {
-        const [c, cg, t] = await Promise.all([
-          api.listarCuentas(),
-          api.listarCategorias(),
-          api.listarTransacciones(),
-        ]);
-        setCuentas(c);
-        setCategorias(cg);
-        setTransacciones(t);
-      } catch (err) {
-        setErrorGlobal(err.message);
-      } finally {
-        setCargandoDatos(false);
-      }
-    })();
-  }, [usuario]);
-
-  useEffect(() => {
-    if (!usuario) return;
-    (async () => {
-      setCargandoPersonaje(true);
-      try {
-        const [p, nv] = await Promise.all([api.obtenerPersonaje(), api.listarNiveles()]);
-        setPersonaje(p);
-        setNiveles(nv);
-      } catch (err) {
-        console.error('No se pudo cargar el personaje', err);
-      } finally {
-        setCargandoPersonaje(false);
-      }
-    })();
-  }, [usuario]);
+  // ---- carga de datos (reutilizable: login inicial, cambio de pantalla, y despues de cada accion) ----
+  const cargarDatosPrincipales = async () => {
+    setCargandoDatos(true);
+    setErrorGlobal('');
+    try {
+      const [c, cg, t] = await Promise.all([
+        api.listarCuentas(),
+        api.listarCategorias(),
+        api.listarTransacciones(),
+      ]);
+      setCuentas(c);
+      setCategorias(cg);
+      setTransacciones(t);
+    } catch (err) {
+      setErrorGlobal(err.message);
+    } finally {
+      setCargandoDatos(false);
+    }
+  };
 
   const cargarPresupuesto = async (mesAConsultar) => {
     setCargandoPresupuesto(true);
@@ -121,10 +95,48 @@ export default function App() {
     }
   };
 
+  const cargarPersonaje = async () => {
+    setCargandoPersonaje(true);
+    try {
+      const [p, nv] = await Promise.all([api.obtenerPersonaje(), api.listarNiveles()]);
+      setPersonaje(p);
+      setNiveles(nv);
+    } catch (err) {
+      console.error('No se pudo cargar el personaje', err);
+    } finally {
+      setCargandoPersonaje(false);
+    }
+  };
+
+  // Refresca todo lo que puede haber cambiado, en paralelo.
+  const refrescarTodo = () =>
+    Promise.all([cargarDatosPrincipales(), cargarPresupuesto(mes), cargarPersonaje()]);
+
+  useEffect(() => {
+    const unsubscribe = suscribirseAUsuario((u) => {
+      setUsuario(u);
+      setCargandoAuth(false);
+    });
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (!usuario) return;
+    cargarDatosPrincipales();
+    cargarPersonaje();
+  }, [usuario]);
+
   useEffect(() => {
     if (!usuario) return;
     cargarPresupuesto(mes);
   }, [usuario, mes]);
+
+  // Cambiar de pantalla siempre trae los datos mas frescos, sin necesidad de F5.
+  const irA = (viewKey) => {
+    setView(viewKey);
+    setMobileMenuOpen(false);
+    refrescarTodo();
+  };
 
   const balanceOf = (cuentaId) => {
     const cuenta = cuentas.find((c) => c.id === cuentaId);
@@ -158,65 +170,53 @@ export default function App() {
   const guardarCuenta = (data) =>
     withSaving(async () => {
       if (data.id) {
-        const sumaTransacciones = transacciones
-          .filter((t) => t.cuentaId === data.id)
-          .reduce((s, t) => s + Number(t.monto), 0);
-        const nuevoSaldoInicial = data.monto - sumaTransacciones;
-        const actualizada = await api.editarCuenta(data.id, { nombre: data.nombre, tipo: data.tipo, saldoInicial: nuevoSaldoInicial });
-        setCuentas((prev) => prev.map((c) => (c.id === data.id ? actualizada : c)));
+        await api.editarCuenta(data.id, { nombre: data.nombre, tipo: data.tipo, saldoInicial: data.monto });
       } else {
-        const nueva = await api.crearCuenta({ nombre: data.nombre, tipo: data.tipo, saldoInicial: data.monto });
-        setCuentas((prev) => [...prev, nueva]);
+        await api.crearCuenta({ nombre: data.nombre, tipo: data.tipo, saldoInicial: data.monto });
         api.sumarXp(111).catch((err) => console.error('No se pudo sumar XP', err));
         mostrarXpToast();
       }
       setAccountModal(null);
+      await refrescarTodo();
     });
 
   const guardarCategoria = (data) =>
     withSaving(async () => {
       if (data.id) {
-        const actualizada = await api.editarCategoria(data.id, data);
-        setCategorias((prev) => prev.map((c) => (c.id === data.id ? actualizada : c)));
+        await api.editarCategoria(data.id, data);
       } else {
-        const nueva = await api.crearCategoria(data);
-        setCategorias((prev) => [...prev, nueva]);
+        await api.crearCategoria(data);
         api.sumarXp(111).catch((err) => console.error('No se pudo sumar XP', err));
         mostrarXpToast();
-        cargarPresupuesto(mes);
       }
       setCategoryModal(null);
+      await refrescarTodo();
     });
 
   const guardarTransaccion = (data) =>
     withSaving(async () => {
       if (data.id) {
-        const actualizada = await api.editarTransaccion(data.id, data);
-        setTransacciones((prev) => prev.map((t) => (t.id === data.id ? actualizada : t)));
+        await api.editarTransaccion(data.id, data);
       } else {
-        const nueva = await api.crearTransaccion(data);
-        setTransacciones((prev) => [nueva, ...prev]);
+        await api.crearTransaccion(data);
         api.sumarXp(111).catch((err) => console.error('No se pudo sumar XP', err));
         mostrarXpToast();
       }
       setTxModal(null);
-      // el gasto recién cargado puede afectar el "gastado" del mes actual, refrescamos
-      if (mes === (data.fecha || '').slice(0, 7)) {
-        cargarPresupuesto(mes);
-      }
+      await refrescarTodo();
     });
 
   const guardarTransferencia = (data) =>
     withSaving(async () => {
-      const resultado = await api.transferir(data);
-      setTransacciones((prev) => [resultado.entrada, resultado.salida, ...prev]);
+      await api.transferir(data);
       setTransferModal(false);
+      await refrescarTodo();
     });
 
   const guardarConciliacion = (data) =>
     withSaving(async () => {
       if (data.diferencia !== 0) {
-        const nueva = await api.crearTransaccion({
+        await api.crearTransaccion({
           cuentaId: data.cuentaId,
           categoriaId: null,
           fecha: new Date().toISOString().slice(0, 10),
@@ -224,14 +224,14 @@ export default function App() {
           monto: data.diferencia,
           nota: `Saldo real ingresado: ${data.saldoReal}`,
         });
-        setTransacciones((prev) => [nueva, ...prev]);
       }
       setReconcileModal(null);
+      await refrescarTodo();
     });
 
   const guardarConciliacionCategoria = (data) =>
     withSaving(async () => {
-      const nueva = await api.crearTransaccion({
+      await api.crearTransaccion({
         cuentaId: data.cuentaId,
         categoriaId: data.categoriaId,
         fecha: new Date().toISOString().slice(0, 10),
@@ -239,38 +239,24 @@ export default function App() {
         monto: -Math.abs(data.monto),
         nota: '',
       });
-      setTransacciones((prev) => [nueva, ...prev]);
-      await cargarPresupuesto(mes);
       setReconcileCategoryModal(null);
+      await refrescarTodo();
     });
 
   const asignarPresupuesto = (categoriaId, montoAsignado) =>
     withSaving(async () => {
       await api.asignarPresupuesto(categoriaId, mes, montoAsignado);
-      await cargarPresupuesto(mes);
+      await refrescarTodo();
     });
 
   const confirmarEliminar = () =>
     withSaving(async () => {
       const { type, id } = confirmDelete;
-      if (type === 'cuenta') {
-        await api.eliminarCuenta(id);
-        setCuentas((prev) => prev.filter((c) => c.id !== id));
-        setTransacciones((prev) => prev.filter((t) => t.cuentaId !== id));
-        cargarPresupuesto(mes);
-      }
-      if (type === 'categoria') {
-        await api.eliminarCategoria(id);
-        setCategorias((prev) => prev.filter((c) => c.id !== id));
-        setTransacciones((prev) => prev.map((t) => (t.categoriaId === id ? { ...t, categoriaId: null } : t)));
-        cargarPresupuesto(mes);
-      }
-      if (type === 'transaccion') {
-        await api.eliminarTransaccion(id);
-        setTransacciones((prev) => prev.filter((t) => t.id !== id));
-        cargarPresupuesto(mes);
-      }
+      if (type === 'cuenta') await api.eliminarCuenta(id);
+      if (type === 'categoria') await api.eliminarCategoria(id);
+      if (type === 'transaccion') await api.eliminarTransaccion(id);
       setConfirmDelete(null);
+      await refrescarTodo();
     });
 
   // ---- pantallas de auth ----
@@ -307,7 +293,7 @@ export default function App() {
         </div>
         <nav>
           {NAV.map(({ key, label }) => (
-            <button key={key} className={view === key ? 'active' : ''} onClick={() => setView(key)}>
+            <button key={key} className={view === key ? 'active' : ''} onClick={() => irA(key)}>
               {label}
             </button>
           ))}
@@ -336,7 +322,7 @@ export default function App() {
                 presupuesto={presupuesto}
                 personaje={personaje}
                 niveles={niveles}
-                onVerDetallesPersonaje={() => setView('personaje')}
+                onVerDetallesPersonaje={() => irA('personaje')}
                 onCerrarSesion={logout}
               />
             )}
@@ -401,10 +387,7 @@ export default function App() {
                 <button
                   key={key}
                   className={view === key ? 'active' : ''}
-                  onClick={() => {
-                    setView(key);
-                    setMobileMenuOpen(false);
-                  }}
+                  onClick={() => irA(key)}
                 >
                   {label}
                 </button>
